@@ -18,6 +18,7 @@ public class SecuritiessystemApplicationTests {
     public void name() {
         System.out.println("-----------");
         redisUtil.set("name","luoyong");
+        System.out.println(redisUtil.get("name")+"===================");
     }
 
     @Test
