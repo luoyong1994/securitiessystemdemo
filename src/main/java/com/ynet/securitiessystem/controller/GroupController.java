@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,10 +40,13 @@ public class GroupController {
         Map<String, Object> map = new HashMap<String,Object>();
         Group group = new Group();
         group.setGroupName(groupName);
-        List<Bond> list = (List<Bond>) groupData.get("productList");
-        Set<Bond> set = 
-//        Set<Bond> set = (Set<Bond>) groupData.get("productList");
-//        group.setProductList(set);
+        List list = (List) groupData.get("productList");
+        Set<Bond> set = new HashSet<Bond>();
+        for(int i=0;i< list.size();i++){
+            Bond bond = JSON.parseObject((String) list.get(i),Bond.class);
+            set.add(bond);
+        }
+        group.setProductList(set);
         User user = new User();
         user.setUserId(userId);
         
