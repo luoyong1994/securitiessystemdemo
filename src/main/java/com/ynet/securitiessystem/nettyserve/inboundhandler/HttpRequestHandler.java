@@ -1,6 +1,10 @@
 package com.ynet.securitiessystem.nettyserve.inboundhandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ynet.securitiessystem.model.Bond;
+import com.ynet.securitiessystem.model.Group;
+import com.ynet.securitiessystem.redis.JavaOps;
+import com.ynet.securitiessystem.redis.RedisUtil;
 import com.ynet.securitiessystem.requestparser.RequestParse;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -15,7 +19,9 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.CharsetUtil;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -34,7 +40,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg)
             throws Exception {
         System.out.println(msg.uri());
-        if(wsUri.equalsIgnoreCase(msg.uri())){
+        if(wsUri.equalsIgnoreCase(msg.uri())){       	
             ctx.fireChannelRead(msg.retain());
         }else{
             RequestParse requestParse = new RequestParse();

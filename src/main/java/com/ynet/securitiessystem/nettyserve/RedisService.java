@@ -26,7 +26,7 @@ public class RedisService {
         	strIdArray[i] = result.get(i).getSymbol();
         	map.put(strIdArray[i], result.get(i));        	
         }  
-        redisUtil.hmset(keyId, map);
+        redisUtil.hmset(key, map);
         
         redisUtil.sSet(keyId, strIdArray);
     }
