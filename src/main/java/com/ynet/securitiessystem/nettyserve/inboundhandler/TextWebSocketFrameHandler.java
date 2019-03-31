@@ -1,25 +1,27 @@
 package com.ynet.securitiessystem.nettyserve.inboundhandler;
 
+import com.alibaba.fastjson.JSON;
+import com.ynet.securitiessystem.nettyserve.ChannelManager;
 import com.ynet.securitiessystem.nettyserve.ZipMessage.ZipUtil;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.group.ChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-
+@Component
+@ChannelHandler.Sharable
 public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
-    private final ChannelGroup group;
 
-    public TextWebSocketFrameHandler(ChannelGroup group) {
-        super();
-        this.group = group;
-    }
+    @Autowired
+    public ChannelManager channelManager;
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt)
@@ -28,13 +30,17 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
         if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
             ctx.pipeline().remove(HttpRequestHandler.class);
 
-            group.writeAndFlush(new TextWebSocketFrame("Client " + ctx.channel() + " joined!"));
-
-            group.add(ctx.channel());
-
+            channelManager.writeAndFlash("Client " + ctx.channel() + " joined!");
             String uuid = UUID.randomUUID().toString().replaceAll("-","");
+
+            channelManager.addChannel(uuid,ctx.channel());
+
+            channelManager.channelGroups.add(ctx.channel());
+
+
             Map<String,String> map = new HashMap<String, String>();
-            TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(ZipUtil.gzip(uuid));
+            map.put("userId",uuid);
+            TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(ZipUtil.gzip(JSON.toJSONString(map)));
             if(ctx.channel().isWritable()){
                 System.out.println(textWebSocketFrame.text());
                 ctx.channel().writeAndFlush(textWebSocketFrame.retain());
@@ -61,8 +67,8 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
 //        String zipMessage = ZipUtil.gzip(stockInfos);
 //        bigDecimal1 = new BigDecimal(zipMessage.getBytes("UTF-8").length);
 //        System.out.println("推送股票消息压缩后大小："+(bigDecimal1.divide(bigDecimal2).toString())+"M");
-        TextWebSocketFrame ZipMsg = new TextWebSocketFrame("123123");
-        group.writeAndFlush(ZipMsg.retain());
+//        TextWebSocketFrame ZipMsg = new TextWebSocketFrame("123123");
+//        group.writeAndFlush(ZipMsg.retain());
 
 
 

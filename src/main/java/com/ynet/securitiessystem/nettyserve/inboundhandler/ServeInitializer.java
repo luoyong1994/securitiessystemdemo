@@ -3,7 +3,6 @@ package com.ynet.securitiessystem.nettyserve.inboundhandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.group.ChannelGroup;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
@@ -11,14 +10,17 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.util.CharsetUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class ServeInitializer extends ChannelInitializer<Channel> {
-    private final ChannelGroup group;
-    public ServeInitializer(ChannelGroup group) {
-        super();
-        this.group = group;
-    }
+
+    @Autowired
+    public TextWebSocketFrameHandler textWebSocketFrameHandler;
+
+    @Autowired
+    public HttpRequestHandler httpRequestHandler;
 
     @Override
     protected void initChannel(Channel ch) throws Exception {
@@ -30,7 +32,7 @@ public class ServeInitializer extends ChannelInitializer<Channel> {
 
         pipeline.addLast(new HttpObjectAggregator(64*1024));// Http消息组装
 
-        pipeline.addLast(new HttpRequestHandler("/ws",group));
+        pipeline.addLast(httpRequestHandler);
 
         pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));//WebSocket通信支持
 
@@ -38,7 +40,7 @@ public class ServeInitializer extends ChannelInitializer<Channel> {
 
         pipeline.addLast("encoder",  new StringEncoder(CharsetUtil.UTF_8));
 
-        pipeline.addLast(new TextWebSocketFrameHandler(group));
+        pipeline.addLast(textWebSocketFrameHandler);
 
 
     }

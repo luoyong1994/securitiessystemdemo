@@ -36,9 +36,8 @@ public class GroupController {
         Map<String,Object> groupData = JSON.parseObject(data,Map.class);
         HttpSession httpSession = request.getSession();
         String groupName = (String) groupData.get("groupName");//获取用户创建的组名
+        String userId = (String) groupData.get("userId");
         String groupKey = UUID.randomUUID().toString().replaceAll("-","");//goupId
-        String userId = httpSession.getId();//获取用户id
-        
         Map<String, Object> map = new HashMap<String,Object>();
         Group group = new Group();
         group.setGroupName(groupName);
@@ -67,21 +66,15 @@ public class GroupController {
     }
 
     @PostMapping("selectOneGroup.do")
-    public String selectOneGroup(HttpServletRequest request,@RequestParam("groupKey") String groupKey){
+    public String selectOneGroup(HttpServletRequest request,@RequestParam("groupKey") String groupKey,@RequestParam("userId") String userId){
+        redisUtil.set(userId+"_groupKey",groupKey);
         System.out.println(groupKey);
         HttpSession httpSession = request.getSession();
-    	String userId = httpSession.getId();
+//    	String userId = httpSession.getId();
     	Map<Object,Object> map = redisUtil.hmget(userId);
     	Group group = (Group) map.get(groupKey);
         System.out.println(group);
     	return "success";
     }
-
-
-    public static void main(String[] args) {
-        String string ="{\"symbol\":\"sz000573\",\"name\":\"粤宏远Ａ\"}";
-        System.out.println(JSON.parseObject(string,Bond.class).toString());
-    }
-
 
 }

@@ -1,43 +1,40 @@
 package com.ynet.securitiessystem.nettyserve.inboundhandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ynet.securitiessystem.nettyserve.ChannelManager;
 import com.ynet.securitiessystem.requestparser.RequestParse;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.group.ChannelGroup;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.CharsetUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-
+@Component
+@ChannelHandler.Sharable
 public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-    private final String wsUri;
-    private ChannelGroup group;
 
-    public HttpRequestHandler(String wsUri,ChannelGroup channelGroup) {
-        super();
-        this.wsUri = wsUri;
-        this.group = channelGroup;
-    }
+    @Autowired
+    public ChannelManager channelManager;
 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg)
             throws Exception {
-        System.out.println(msg.uri());
-        if(wsUri.equalsIgnoreCase(msg.uri())){       	
+        if("/ws".equalsIgnoreCase(msg.uri())){
             ctx.fireChannelRead(msg.retain());
-
         }else{
+            System.out.println(msg.uri());
             RequestParse requestParse = new RequestParse();
             FullHttpResponse response = null;
             if (msg.method() == HttpMethod.GET) {
@@ -47,18 +44,19 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                 response = requestParse.responseOK(HttpResponseStatus.OK, buf);
             } else if (msg.method() == HttpMethod.POST) {
                 Map<String,Object> map = requestParse.getPostParamsFromChannel(msg);
-                System.out.println(map);
+//                System.out.println(map);
                 String data = "POST method over";
                 ByteBuf content = Unpooled.copiedBuffer(data, CharsetUtil.UTF_8);
                 response = requestParse.responseOK(HttpResponseStatus.OK, content);
                 ObjectMapper objectMapper = new ObjectMapper();
-                TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame((String)map.get("data"));
-                group.writeAndFlush(textWebSocketFrame);
+                String reciveMesg = (String)map.get("data");
+                channelManager.writeAndFlash(reciveMesg);
+//                channelManager.channelGroups.writeAndFlush(reciveMesg);
             } else {
                 response = requestParse.responseOK(HttpResponseStatus.INTERNAL_SERVER_ERROR, null);
             }
-            // 发送响应
             ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+            // 发送响应
 
 
 
