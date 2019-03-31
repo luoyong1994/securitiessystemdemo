@@ -32,5 +32,14 @@ public class Group {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Group{" +
+				"groupKey='" + groupKey + '\'' +
+				", groupName='" + groupName + '\'' +
+				", user=" + user +
+				", productList=" + productList +
+				'}';
+	}
 }

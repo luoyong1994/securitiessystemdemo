@@ -8,7 +8,9 @@ import com.ynet.securitiessystem.model.User;
 import com.ynet.securitiessystem.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,8 +44,8 @@ public class GroupController {
         group.setGroupName(groupName);
         List list = (List) groupData.get("productList");
         Set<Bond> set = new HashSet<Bond>();
-        for(int i=0;i< list.size();i++){
-            Bond bond = JSON.parseObject((String) list.get(i),Bond.class);
+        for(int i=0;i<list.size();i++){
+            Bond bond = JSON.parseObject(list.get(i).toString(),Bond.class);
             set.add(bond);
         }
         group.setProductList(set);
@@ -64,16 +66,22 @@ public class GroupController {
     	return map;
     }
 
-    @RequestMapping("selectOneGroup.do")
-    public String selectOneGroup(HttpServletRequest request,String groupKey){
+    @PostMapping("selectOneGroup.do")
+    public String selectOneGroup(HttpServletRequest request,@RequestParam("groupKey") String groupKey){
+        System.out.println(groupKey);
         HttpSession httpSession = request.getSession();
     	String userId = httpSession.getId();
     	Map<Object,Object> map = redisUtil.hmget(userId);
     	Group group = (Group) map.get(groupKey);
+        System.out.println(group);
     	return "success";
     }
 
 
+    public static void main(String[] args) {
+        String string ="{\"symbol\":\"sz000573\",\"name\":\"粤宏远Ａ\"}";
+        System.out.println(JSON.parseObject(string,Bond.class).toString());
+    }
 
 
 }
