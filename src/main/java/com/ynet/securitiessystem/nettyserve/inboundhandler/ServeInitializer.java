@@ -1,6 +1,7 @@
 package com.ynet.securitiessystem.nettyserve.inboundhandler;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpObjectAggregator;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@ChannelHandler.Sharable
 public class ServeInitializer extends ChannelInitializer<Channel> {
 
     @Autowired

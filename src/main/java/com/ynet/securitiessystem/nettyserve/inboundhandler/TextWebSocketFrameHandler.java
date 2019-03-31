@@ -30,7 +30,7 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
         if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
             ctx.pipeline().remove(HttpRequestHandler.class);
 
-            channelManager.writeAndFlash("Client " + ctx.channel() + " joined!");
+//            channelManager.writeAndFlash("Client " + ctx.channel() + " joined!");
             String uuid = UUID.randomUUID().toString().replaceAll("-","");
 
             channelManager.addChannel(uuid,ctx.channel());
