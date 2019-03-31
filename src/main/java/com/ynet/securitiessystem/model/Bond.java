@@ -1,6 +1,7 @@
 package com.ynet.securitiessystem.model;
 
 public class Bond {
+
 	private String symbol;
 	private String name;
 	private String trade;
@@ -11,7 +12,7 @@ public class Bond {
 	private String outamount;
 	private String netamount;
 	private String ratioamount;
-	private String r0_in;
+	private String r0_in;//特大单
 	private String r0_out;
 	private String r0_net;
 	private String r3_in;
