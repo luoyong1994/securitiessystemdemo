@@ -51,7 +51,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                 ObjectMapper objectMapper = new ObjectMapper();
                 String reciveMesg = (String)map.get("data");
                 channelManager.writeAndFlash(reciveMesg);
-//                channelManager.channelGroups.writeAndFlush(reciveMesg);
             } else {
                 response = requestParse.responseOK(HttpResponseStatus.INTERNAL_SERVER_ERROR, null);
             }

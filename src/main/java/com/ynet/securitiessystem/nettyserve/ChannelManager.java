@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,10 +75,11 @@ public class ChannelManager {
             try {
                 System.out.println("推送股票信息条数：" + stockInfoList.size());
                 String stockInfos = JSON.toJSONString(stockInfoList);
-                BigDecimal bigDecimal1 = new BigDecimal(stockInfos.getBytes("UTF-8").length);
+                String encodedStockInfos = URLEncoder.encode(stockInfos,"UTF-8");
+                BigDecimal bigDecimal1 = new BigDecimal(encodedStockInfos.getBytes("UTF-8").length);
                 BigDecimal bigDecimal2 = new BigDecimal(1024);
                 System.out.println("推送股票消息大小为：" + bigDecimal1.divide(bigDecimal2).toString() + "K");
-                String zipMessage = ZipUtil.gzip(stockInfos);
+                String zipMessage = ZipUtil.gzip(encodedStockInfos);
                 bigDecimal1 = new BigDecimal(zipMessage.getBytes("UTF-8").length);
                 System.out.println("推送股票消息压缩后大小：" + (bigDecimal1.divide(bigDecimal2).toString()) + "K");
                 TextWebSocketFrame ZipMsg = new TextWebSocketFrame(zipMessage);

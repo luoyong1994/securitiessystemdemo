@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -40,7 +41,8 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
 
             Map<String,String> map = new HashMap<String, String>();
             map.put("userId",uuid);
-            TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(ZipUtil.gzip(JSON.toJSONString(map)));
+            String UUIStr = JSON.toJSONString(map);
+            TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(ZipUtil.gzip(URLEncoder.encode(UUIStr,"UTF-8")));
             if(ctx.channel().isWritable()){
                 System.out.println(textWebSocketFrame.text());
                 ctx.channel().writeAndFlush(textWebSocketFrame.retain());
