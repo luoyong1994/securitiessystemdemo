@@ -48,7 +48,6 @@ public class ChannelManager {
             Set<String> pids = new HashSet<String>();
             List<Bond> result = JSON.parseArray(temp, Bond.class);
             Map<String, Bond> map = new HashMap<String, Bond>();
-            String[] strIdArray = new String[result.size()];
             for (int i = 0; i < result.size(); i++) {
                 pids.add(result.get(i).getSymbol());
                 map.put(result.get(i).getSymbol(), result.get(i));
